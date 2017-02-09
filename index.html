@@ -1,13 +1,147 @@
-<!DOCTYPE html>vcb
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+   <link href="style.css" rel="stylesheet">
+    <style>
+        .panel-heading.note-toolbar .note-table .note-color .dropdown-menu {
+            min-width: 175px;
+        }
+        .panel-heading.note-toolbar .note-table .note-color .dropdown-toggle {
+            width: auto;
+            padding-left: 10px;
+        }
+    </style>
 </head>
-<body>
-3
-5
+<body ng-app="myApp" ng-controller="myCtr">
+
+
+<summernote id="summernote" config="options" ng-model="text"></summernote>
+<div id="box" style="height: 100px ; width: 100px; background: red;"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
+<script src="../bower_components/angular-summernote/src/angular-summernote.js"></script>
+<script src="../angular-sanitize.min.js"></script>
+<script>
+    angular.module('myApp', ['summernote', 'ngSanitize']);
+
+    angular.module('myApp')
+        .controller('myCtr', ['$scope', '$timeout', '$sanitize', function ($scope,$timeout,$sanitize) {
+
+            function formPalette(name) {
+                var code = '<li>';
+                code += '<div class="btn-group">';
+                code += '<div class="note-palette-title">'+ name +'</div>';
+                code += '<div><button type="button" class="note-color-reset btn btn-default" data-value="transparent">Transparent</button></div>';
+                code += '<div class="note-holder">';
+                code += '<div class="note-color-palette">';
+                for (var i=0; i<$.summernote.options.colors.length; i++){
+                    code += '<div class="note-color-row">';
+                    for (var j=0; j<$.summernote.options.colors[i].length; j++){
+                        code += '<button type="button" class="note-color-btn" style="background-color:'+ $.summernote.options.colors[i][j] +'" data-value="'+ $.summernote.options.colors[i][j] +'" data-toggle="tooltip" data-placement="bottom" tabindex="-1" title="'+ $.summernote.options.colors[i][j] +'"></button>'
+                    }
+                    code += '</div>'
+                }
+                code += '</div>';
+                code += '</div>';
+                code += '</div>';
+                code += '</li>';
+
+
+                return code
+
+            }
+
+            var HelloButton = function (context) {
+                var ui = $.summernote.ui;
+
+                // create button
+                var button = ui.buttonGroup([
+                    ui.button({
+                        className: 'dropdown-toggle',
+                        contents: '<i class="note-icon-minus" style="color:#ddd;">',
+                        tooltip: 'Border Color',
+                        data: {
+                            toggle: 'dropdown'
+                        }
+                    }),
+                    ui.dropdown({
+                    contents: formPalette('Border Color'),
+                    callback: function ($dropdown) {
+                        $dropdown.find('button').each(function () {
+                            $(this).click(function () {
+                                $('.note-editing-area td').css({borderColor: $(this).data().value});
+                                $('#box').css({background: $(this).data().value});
+                                $('.note-table .note-icon-minus').css({color: $(this).data().value});
+                                //console.log($(this).data().value)
+                            });
+                        });
+                    }
+                })
+
+                ]);
+
+                return button.render();   // return button as jquery object
+            };
+
+
+            $scope.options = {
+                toolbar: [
+                    ['edit',['undo','redo']],
+                    ['headline', ['style']],
+                    ['style', ['bold', 'italic', 'underline', 'superscript', 'subscript', 'strikethrough', 'clear']],
+                    ['fontface', ['fontname']],
+                    ['textsize', ['fontsize']],
+                    ['fontclr', ['color']],
+                    ['alignment', ['ul', 'ol', 'paragraph', 'lineheight']],
+                    ['height', ['height']],
+                    ['table', ['table', 'hello']],
+                    ['insert', ['link','picture','video','hr']],
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                buttons: {
+                    hello: HelloButton
+                },
+                callbacks : {
+                    onInit: function () {
+                        $('.note-table > div:nth-child(2)').addClass('note-color');
+                        $('[data-toggle="tooltip"]').tooltip();
+                    },
+                    onChange: function (context) {
+                            $scope.text = $sanitize(context);
+
+                    }
+                },
+                popover: {
+                    image: [
+                        ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                        ['remove', ['removeMedia']]
+                    ],
+                    link: [
+                        ['link', ['linkDialogShow', 'unlink']]
+                    ],
+                    air: [
+                        ['color', ['color']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['para', ['ul', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']]
+                    ]
+                },
+                maximumImageFileSize : 100000,
+            };
+
+
+
+
+
+        }])
+
+</script>
 </body>
 </html>
-123321
-654
